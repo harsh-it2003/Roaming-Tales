@@ -1,9 +1,9 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import userRouter from './routing/user-routes';
-import postRouter from './routing/post-router';
-import dotenv from 'dotenv';
-import cors from 'cors';
+const express = require('express');
+const mongoose = require('mongoose');
+const userRouter = require('./routing/user-routes');
+const postRouter = require('./routing/post-router');
+const dotenv = require('dotenv');
+const cors = require('cors');
 
 const app = express();
 dotenv.config();

@@ -1,6 +1,7 @@
-import Posts from '../models/Post';
-import mongoose from 'mongoose';
-import Users from '../models/User'
+const Posts = require('../models/Post');
+const mongoose = require('mongoose');
+const Users = require('../models/User');
+
 
 const getAllPosts = async (req, res) => {
     try {
@@ -14,7 +15,7 @@ const getAllPosts = async (req, res) => {
 const addAPost = async (req, res) => {
 
     try {
-        const { title, description, image, location, date, user } = req.body;
+        const { title, description, image, location, date, user, comments} = req.body;
 
         if (!title || !description || !image || !location || !date || !user || title.trim().length === 0 || description.trim().length === 0 || image.trim().length === 0 || location.trim().length === 0 || date.trim().length === 0 || user.trim().length === 0) {
             return res.status(422).json({ message: "Invalid data" });
@@ -25,7 +26,7 @@ const addAPost = async (req, res) => {
             return res.status(404).json({ message: "No such user found" });
         }
 
-        let post = new Posts({ title, description, image, location, date, user });
+        let post = new Posts({ title, description, image, location, date, user, comments});
 
         const session = await mongoose.startSession();
 
@@ -99,10 +100,68 @@ const deletePost = async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        return res.status(406).json({message:"couldn't delete the post"});
+        return res.status(406).json({ message: "couldn't delete the post" });
     }
 
 }
 
 
-module.exports = { getAllPosts, addAPost, getPostWithID, updatePost, deletePost };
+const addCommentToPost = async (req, res) => {
+    const postId = req.params.id;
+    const {comment} = req.body;
+  
+    if (!postId || !comment || postId.trim().length === 0) {
+      return res.status(422).json({ message: "Invalid data" });
+    }
+
+    try {
+      const post = await Posts.findById(postId);
+      if (!post) {
+        return res.status(404).json({ message: "No post found" });
+      }
+
+      const user = await Users.findById(comment.user);
+      const username=user.name;
+      comment.user=username;
+      
+      post.comments.push(comment);
+      await post.save();
+      return res.status(200).json({comment});
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ message: "Unexpected error occurred" });
+    }
+  };
+  
+
+const getCommentsForPost = async (req, res) => {
+    const postId = req.params.id;
+
+    if (!postId || postId.trim().length === 0) {
+        return res.status(422).json({ message: "Invalid data" });
+    }
+
+    try {
+        const post = await Posts.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: "No post found" });
+        }
+
+        const comments = post.comments;
+        return res.status(200).json({ comments });
+    } catch (err) {
+        console.log(err);
+        return res.status(406).json({ message: "Unexpected error occurred" });
+    }
+}
+
+
+module.exports = {
+    getAllPosts,
+    addAPost,
+    getPostWithID,
+    updatePost,
+    deletePost,
+    addCommentToPost,
+    getCommentsForPost,
+};

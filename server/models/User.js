@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const userSchema=new mongoose.Schema({
     name:{
@@ -15,8 +15,14 @@ const userSchema=new mongoose.Schema({
         required:true,
         minLength:5,
     },
-    posts:[{type:mongoose.Types.ObjectId,ref:"Post"}]
+    posts:[
+        {
+            type:mongoose.Types.ObjectId,
+            ref:"Post"
+        }
+    ]
 });
 
 const Users=new mongoose.model('User',userSchema);
+
 module.exports=Users;

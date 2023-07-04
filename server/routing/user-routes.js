@@ -1,5 +1,12 @@
-import Router from 'express';
-import { getAllUsers, signup, login, deleteUser, getUserById} from '../controllers/user-controllers';
+const express = require('express');
+const Router = express.Router;
+const userControllers = require('../controllers/user-controllers');
+const getAllUsers = userControllers.getAllUsers;
+const signup = userControllers.signup;
+const login = userControllers.login;
+const deleteUser = userControllers.deleteUser;
+const getUserById = userControllers.getUserById;
+
 
 // validation is to be put in here
 
@@ -11,4 +18,4 @@ userRouter.post("/signup", signup);
 userRouter.post("/login", login);
 userRouter.delete("/:id",deleteUser);
 
-export default userRouter;
+module.exports = userRouter;
